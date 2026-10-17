@@ -36,6 +36,19 @@ th{color:var(--mut);font-size:13px}
 svg{width:100%;max-width:420px;background:var(--bg);border:1px solid var(--bd);border-radius:8px}
 button.act{margin-top:12px;padding:9px 14px;border:0;border-radius:6px;background:var(--ac);color:var(--acx);font-weight:700;font-size:15px;cursor:pointer}
 .note{font-size:12px;color:var(--mut);margin-top:10px}
+
+.printbar{display:flex;gap:8px;align-items:center;margin:12px 0 0;flex-wrap:wrap}
+.printbar input{flex:1 1 220px;min-width:0}
+.printbar button{margin-top:0}
+.printonly{display:none}
+@media print{
+ header{color:#000!important;background:#fff!important;border-bottom:2px solid #000!important}
+ nav,.printbar,button{display:none!important}
+ section{display:none!important}section.on{display:block!important;border:0!important}
+ .printonly{display:block;margin:8px 0;font-size:14px}
+ body{background:#fff!important;color:#000!important}
+ .res div,input,select{border-color:#999!important}
+}
 </style>
 </head>
 <body>
@@ -44,15 +57,18 @@ button.act{margin-top:12px;padding:9px 14px;border:0;border-radius:6px;backgroun
 <button class="on" data-t="t1">Patrón circular</button>
 <button data-t="t2">RPM y avance</button>
 <button data-t="t3">Roscado</button>
-<button data-t="t4">Taladrado</button>
 <button data-t="t5">mm / pulgada</button>
-<button data-t="t7">Línea / rejilla</button>
-<button data-t="t8">Cajeras</button>
-<button data-t="t9">Fresado rosca</button>
+<button data-t="t11">Trigonometría</button>
+<button data-t="t12">Tolerancias</button>
+<button data-t="t13">Arcos</button>
+<button data-t="t7">Patrón rectangular</button>
 <button data-t="t6">Programa CNC</button>
 <button data-t="t10">Herramientas</button>
 </nav>
 <main>
+<div class="printbar"><input id="pnom" placeholder="Nombre de la pieza o trabajo (para la ficha impresa)"><button class="act" id="pprint">Imprimir / PDF</button></div>
+<div class="printonly"><b id="ptab"></b> · <span id="pimp"></span></div>
+
 
 <section id="t1" class="on">
 <div class="grid">
@@ -105,28 +121,9 @@ button.act{margin-top:12px;padding:9px 14px;border:0;border-radius:6px;backgroun
 <div><b id="rRF">–</b><span>F sincronizado (mm/min) = S × paso</span></div>
 <div><b id="rRZ">–</b><span>Profundidad agujero mín. (mm)</span></div>
 </div>
-<p class="note">Broca previa: valor comercial habitual para la serie gruesa y gas; en el resto, el teórico redondeado. Profundidad mínima = longitud de rosca + 2 pasos. Orientativo: comprueba con tu tabla de taller.</p>
+<p class="note">NPT: Ø nominal = diámetro exterior del tubo (en la boca de la rosca cónica) y broca previa para macho cónico NPT con 1:16; en NPT la altura de filete es 0,8 × paso; para roscar con macho cónico la profundidad de agujero y la cota Z dependen del macho. Broca previa: valor comercial habitual para la serie gruesa, gas y NPT; en el resto, el teórico redondeado. Profundidad mínima = longitud de rosca + 2 pasos. Orientativo: comprueba con tu tabla de taller.</p>
 </section>
 
-<section id="t4">
-<div class="grid">
-<div><label>Ø broca (mm)</label><input id="bD" type="number" step="any" value="8"></div>
-<div><label>Profundidad útil (mm)</label><input id="bL" type="number" step="any" value="20"></div>
-<div><label>Ángulo de punta (°)</label><input id="bA" type="number" step="any" value="118"></div>
-<div><label>Vc (m/min)</label><input id="bV" type="number" step="any" value="25"></div>
-<div><label>Avance por vuelta (mm)</label><input id="bF" type="number" step="any" value="0.15"></div>
-<div><label>Paso de picado Q (mm), 0 = sin picar</label><input id="bQ" type="number" step="any" value="0"></div>
-</div>
-<div class="res">
-<div><b id="bt">–</b><span>Longitud de punta (mm)</span></div>
-<div><b id="bZ">–</b><span>Profundidad total Z con punta (mm)</span></div>
-<div><b id="bS">–</b><span>S (rpm)</span></div>
-<div><b id="bFm">–</b><span>F (mm/min)</span></div>
-<div><b id="bT">–</b><span>Tiempo de corte (s)</span></div>
-<div><b id="bN">–</b><span>Nº de picados</span></div>
-</div>
-<p class="note">Longitud de punta = (Ø/2) / tan(ángulo/2). Tiempo sin contar aproximación, retirada ni picado en vacío.</p>
-</section>
 
 <section id="t5">
 <div class="grid">
@@ -145,7 +142,7 @@ button.act{margin-top:12px;padding:9px 14px;border:0;border-radius:6px;backgroun
 <div class="grid">
 <div><label>Control</label><select id="gc"><option value="hh">Heidenhain</option><option value="fa">Fanuc</option><option value="fg">Fagor</option></select></div>
 <div><label>Operación</label><select id="go"><option value="81">Taladrado simple</option><option value="83">Taladrado picado</option><option value="84">Roscado rígido</option></select></div>
-<div><label>Puntos</label><select id="gp"><option value="pat">Patrón circular (pestaña 1)</option><option value="grid">Línea / rejilla (pestaña)</option><option value="man">Lista manual</option></select></div>
+<div><label>Puntos</label><select id="gp"><option value="pat">Patrón circular (pestaña 1)</option><option value="grid">Patrón rectangular (pestaña)</option><option value="man">Lista manual</option></select></div>
 <div><label>Nombre / nº programa</label><input id="gn" value="1000"></div>
 <div><label>Nº herramienta</label><input id="gt" type="number" value="1"></div>
 <div><label>Profundidad Z (negativa)</label><input id="gz" type="number" step="any" value="-20"></div>
@@ -165,64 +162,21 @@ button.act{margin-top:12px;padding:9px 14px;border:0;border-radius:6px;backgroun
 </section>
 
 <section id="t7">
+<h2 style="margin:0 0 12px;font-size:20px">Patrón rectangular</h2>
 <div class="grid">
 <div><label>Nº agujeros en X</label><input id="lx" type="number" min="1" step="1" value="4"></div>
-<div><label>Nº agujeros en Y (1 = línea)</label><input id="ly" type="number" min="1" step="1" value="3"></div>
+<div><label>Nº agujeros en Y (1 = una fila)</label><input id="ly" type="number" min="1" step="1" value="3"></div>
 <div><label>Paso en X (mm)</label><input id="lpx" type="number" step="any" value="20"></div>
 <div><label>Paso en Y (mm)</label><input id="lpy" type="number" step="any" value="15"></div>
-<div><label>Origen X</label><input id="lox" type="number" step="any" value="0"></div>
-<div><label>Origen Y</label><input id="loy" type="number" step="any" value="0"></div>
+<div><label>Origen X (1.er agujero)</label><input id="lox" type="number" step="any" value="0"></div>
+<div><label>Origen Y (1.er agujero)</label><input id="loy" type="number" step="any" value="0"></div>
 <div><label>Ángulo de giro (°)</label><input id="lag" type="number" step="any" value="0"></div>
 </div>
 <div class="wrap"><div><svg id="lsvg" viewBox="-110 -110 220 220"></svg></div>
 <div><table><thead><tr><th>#</th><th>X</th><th>Y</th></tr></thead><tbody id="ltb"></tbody></table></div></div>
 </section>
 
-<section id="t8">
-<div class="grid">
-<div><label>Tipo</label><select id="ct"><option value="r">Rectangular</option><option value="c">Circular</option></select></div>
-<div><label>Largo / Ø (mm)</label><input id="cl" type="number" step="any" value="60"></div>
-<div><label>Ancho (mm, solo rectangular)</label><input id="cw" type="number" step="any" value="40"></div>
-<div><label>Radio de esquina (mm)</label><input id="ccr" type="number" step="any" value="6"></div>
-<div><label>Profundidad (mm)</label><input id="cd" type="number" step="any" value="15"></div>
-<div><label>Ø fresa (mm)</label><input id="cD" type="number" step="any" value="10"></div>
-<div><label>Paso radial ae (% de Ø)</label><input id="cae" type="number" step="any" value="40"></div>
-<div><label>Paso axial ap (mm)</label><input id="cap" type="number" step="any" value="5"></div>
-<div><label>Sobrematerial de acabado (mm)</label><input id="cfin" type="number" step="any" value="0.2"></div>
-<div><label>F (mm/min)</label><input id="cF" type="number" step="any" value="800"></div>
-</div>
-<div class="res">
-<div><b id="cR1">–</b><span>Pasadas axiales</span></div>
-<div><b id="cR2">–</b><span>Pasadas radiales por nivel</span></div>
-<div><b id="cR3">–</b><span>Contorno de trayectoria (mm)</span></div>
-<div><b id="cR4">–</b><span>Longitud total aprox. (mm)</span></div>
-<div><b id="cR5">–</b><span>Tiempo aprox. (min)</span></div>
-<div><b id="cR6">–</b><span>Comprobación de esquina</span></div>
-</div>
-<p class="note">Estimación de desbaste en pasadas concéntricas y acabado de contorno. Tiempo sin entradas, rampas ni cambios de nivel.</p>
-</section>
 
-<section id="t9">
-<div class="grid">
-<div><label>Tipo</label><select id="ftp"><option value="i">Interior</option><option value="e">Exterior</option></select></div>
-<div><label>Ø nominal rosca (mm)</label><input id="fD" type="number" step="any" value="24"></div>
-<div><label>Paso (mm)</label><input id="fP" type="number" step="any" value="3"></div>
-<div><label>Longitud de rosca (mm)</label><input id="fL" type="number" step="any" value="20"></div>
-<div><label>Ø fresa de roscar (mm)</label><input id="fd" type="number" step="any" value="16"></div>
-<div><label>Nº de dientes</label><input id="fnz" type="number" step="1" value="4"></div>
-<div><label>Vc (m/min)</label><input id="fvc" type="number" step="any" value="100"></div>
-<div><label>fz (mm/diente)</label><input id="ffz" type="number" step="any" value="0.05"></div>
-</div>
-<div class="res">
-<div><b id="fR1">–</b><span>Radio de trayectoria (mm)</span></div>
-<div><b id="fR2">–</b><span>Nº de vueltas de hélice</span></div>
-<div><b id="fR3">–</b><span>Avance Z por vuelta (mm) = paso</span></div>
-<div><b id="fR4">–</b><span>S (rpm)</span></div>
-<div><b id="fR5">–</b><span>F en filo (mm/min)</span></div>
-<div><b id="fR6">–</b><span>F en centro de fresa (mm/min)</span></div>
-</div>
-<p class="note">Interior: F centro = F filo × (Ø rosca − Ø fresa) / Ø rosca. Exterior: F centro = F filo × (Ø rosca + Ø fresa) / Ø rosca. Radio de trayectoria interior = (Ø rosca − Ø fresa)/2 (nominal; ajusta con corrector según tolerancia). Vueltas = longitud / paso + 1.</p>
-</section>
 
 <section id="t10">
 <div class="grid">
@@ -235,6 +189,67 @@ button.act{margin-top:12px;padding:9px 14px;border:0;border-radius:6px;backgroun
 <button class="act" id="hs">Guardar herramienta</button>
 <table><thead><tr><th style="text-align:left">Nombre</th><th>Ø</th><th>Z</th><th>Vc</th><th>fz</th><th></th></tr></thead><tbody id="htb"></tbody></table>
 <p class="note">Se guarda en este navegador y en este dispositivo. "Usar" envía los datos a la pestaña RPM y avance.</p>
+</section>
+
+<section id="t11">
+<h2 style="margin:0 0 12px;font-size:20px">Triángulo rectángulo</h2>
+<div class="grid">
+<div><label>Datos conocidos</label><select id="gmod">
+<option value="ah">Ángulo e hipotenusa</option><option value="aa">Ángulo y cateto adyacente</option><option value="ao">Ángulo y cateto opuesto</option>
+<option value="co">Cateto adyacente y opuesto</option><option value="ch">Cateto adyacente e hipotenusa</option><option value="oh">Cateto opuesto e hipotenusa</option></select></div>
+<div><label id="gl1">Ángulo α (°)</label><input id="gv1" type="number" step="any" value="30"></div>
+<div><label id="gl2">Hipotenusa (H) · mm</label><input id="gv2" type="number" step="any" value="100"></div>
+</div>
+<p class="note" id="gerr" style="color:var(--ac)"></p>
+<div class="wrap"><div><svg id="gsvg" viewBox="0 0 300 190" style="max-width:100%"></svg></div>
+<div class="res" style="margin-top:0">
+<div><b id="gA">–</b><span>Ángulo α · <span id="gB"></span></span></div>
+<div><b id="gCA">–</b><span>Cateto adyacente (CA) mm</span></div>
+<div><b id="gCO">–</b><span>Cateto opuesto (CO) mm</span></div>
+<div><b id="gH">–</b><span>Hipotenusa (H) mm</span></div>
+</div></div>
+<p class="note" id="gtr"></p>
+<p class="note">Ángulo α entre el cateto adyacente y la hipotenusa. Introduce medidas positivas y un ángulo entre 0° y 90°. Útil para chaflanes, conos, planos inclinados y pasos de cuerda.</p>
+</section>
+
+<section id="t12">
+<h2 style="margin:0 0 12px;font-size:20px">Tolerancias y ajustes · ISO 286</h2>
+<div class="grid">
+<div><label>Calcular</label><select id="tomo"><option value="aj">Ajuste (agujero y eje)</option><option value="ag">Solo agujero</option><option value="ej">Solo eje</option></select></div>
+<div><label>Diámetro nominal (mm, de 1 a 500)</label><input id="toD" type="number" step="any" value="50"></div>
+<div><label>Letra del agujero</label><select id="toL"></select></div>
+<div><label>Calidad del agujero (IT)</label><select id="toI"></select></div>
+<div><label>Letra del eje</label><select id="toLs"></select></div>
+<div><label>Calidad del eje (IT)</label><select id="toIs"></select></div>
+</div>
+<p class="note" id="toerr" style="color:var(--ac)"></p>
+<div class="res" id="tohw"><div style="grid-column:1/-1"><b id="toHt" style="font-size:18px">–</b><span>Tolerancia ISO del agujero</span></div>
+<div><b id="toHmin">–</b><span>Agujero mínimo (mm)</span></div><div><b id="toHmax">–</b><span>Agujero máximo (mm)</span></div></div>
+<div class="res" id="toew"><div style="grid-column:1/-1"><b id="toEt" style="font-size:18px">–</b><span>Tolerancia ISO del eje</span></div>
+<div><b id="toEmin">–</b><span>Eje mínimo (mm)</span></div><div><b id="toEmax">–</b><span>Eje máximo (mm)</span></div></div>
+<div class="res" id="tofw"><div style="grid-column:1/-1"><b id="toFt" style="font-size:18px">–</b><span id="toFs"></span></div></div>
+<p class="note">Cálculo orientativo ISO 286 para agujeros D, E, F, G, H y JS, y ejes d, e, f, g, h y js, calidades IT5 a IT12, de 1 a 500 mm. Confirma cotas críticas con la tabla de la norma y el plano.</p>
+</section>
+
+<section id="t13">
+<h2 style="margin:0 0 12px;font-size:20px">Calculadora de arcos</h2>
+<p class="note" style="margin-top:0">Elige dos valores conocidos, introdúcelos y se calculan los demás. Arcos menores de 180°.</p>
+<div class="grid">
+<div><label>Valor conocido 1</label><select id="ak1"></select></div>
+<div><label id="al1">Radio R · mm</label><input id="av1" type="number" step="any" value="50"></div>
+<div><label>Valor conocido 2</label><select id="ak2"></select></div>
+<div><label id="al2">Ángulo A · °</label><input id="av2" type="number" step="any" value="45"></div>
+</div>
+<p class="note" id="aerr" style="color:var(--ac)"></p>
+<div class="wrap"><div><svg id="asvg" viewBox="0 0 300 200" style="max-width:100%"></svg></div>
+<div class="res" style="margin-top:0">
+<div><b id="aH">–</b><span>Altura o flecha H (mm)</span></div>
+<div><b id="aW">–</b><span>Anchura o cuerda W (mm)</span></div>
+<div><b id="aR">–</b><span>Radio R (mm)</span></div>
+<div><b id="aL">–</b><span>Longitud de arco L (mm)</span></div>
+<div><b id="aA">–</b><span>Ángulo central A (°)</span></div>
+</div></div>
+<p class="note">Esquema de referencia, no a escala. H = altura o flecha · W = anchura o cuerda · R = radio · L = longitud del arco · A = ángulo central.</p>
 </section>
 </main>
 
@@ -302,12 +317,14 @@ patron();carga();
 /* Roscas */
 const M=(n,D,P,b)=>({n,D,P,b});
 const IN=(n,Di,tpi,b)=>({n,D:Di*25.4,P:25.4/tpi,t:tpi,b});
+const NP=(n,Di,tpi,b)=>({n,D:Di*25.4,P:25.4/tpi,t:tpi,b,hf:.8});
 const ROSCAS={
  'Métrica gruesa':[M('M3',3,.5,2.5),M('M4',4,.7,3.3),M('M5',5,.8,4.2),M('M6',6,1,5),M('M8',8,1.25,6.8),M('M10',10,1.5,8.5),M('M12',12,1.75,10.2),M('M14',14,2,12),M('M16',16,2,14),M('M18',18,2.5,15.5),M('M20',20,2.5,17.5),M('M22',22,2.5,19.5),M('M24',24,3,21),M('M27',27,3,24),M('M30',30,3.5,26.5)],
  'Métrica fina':[M('M8x1',8,1),M('M10x1',10,1),M('M10x1.25',10,1.25),M('M12x1.25',12,1.25),M('M12x1.5',12,1.5),M('M14x1.5',14,1.5),M('M16x1.5',16,1.5),M('M18x1.5',18,1.5),M('M20x1.5',20,1.5),M('M22x1.5',22,1.5),M('M24x1.5',24,1.5),M('M24x2',24,2),M('M27x2',27,2),M('M30x1.5',30,1.5),M('M30x2',30,2)],
  'UNC':[IN('#4-40',.112,40),IN('#6-32',.138,32),IN('#8-32',.164,32),IN('#10-24',.19,24),IN('1/4-20',.25,20),IN('5/16-18',.3125,18),IN('3/8-16',.375,16),IN('7/16-14',.4375,14),IN('1/2-13',.5,13),IN('9/16-12',.5625,12),IN('5/8-11',.625,11),IN('3/4-10',.75,10),IN('7/8-9',.875,9),IN('1-8',1,8)],
  'UNF':[IN('#6-40',.138,40),IN('#8-36',.164,36),IN('#10-32',.19,32),IN('1/4-28',.25,28),IN('5/16-24',.3125,24),IN('3/8-24',.375,24),IN('7/16-20',.4375,20),IN('1/2-20',.5,20),IN('9/16-18',.5625,18),IN('5/8-18',.625,18),IN('3/4-16',.75,16),IN('7/8-14',.875,14),IN('1-12',1,12)],
- 'Gas BSP (G)':[IN('G1/8',.383,28,8.8),IN('G1/4',.518,19,11.8),IN('G3/8',.656,19,15.25),IN('G1/2',.825,14,19),IN('G5/8',.902,14,21),IN('G3/4',1.041,14,24.5),IN('G1',1.309,11,30.5)]
+ 'Gas BSP (G)':[IN('G1/8',.383,28,8.8),IN('G1/4',.518,19,11.8),IN('G3/8',.656,19,15.25),IN('G1/2',.825,14,19),IN('G5/8',.902,14,21),IN('G3/4',1.041,14,24.5),IN('G1',1.309,11,30.5)],
+ 'NPT (cónica 1:16)':[NP('1/16-27',.3125,27,6.3),NP('1/8-27',.405,27,8.6),NP('1/4-18',.54,18,11.1),NP('3/8-18',.675,18,14.7),NP('1/2-14',.84,14,18.3),NP('3/4-14',1.05,14,23.4),NP('1-11.5',1.315,11.5,29.4),NP('1-1/4-11.5',1.66,11.5,38.1),NP('1-1/2-11.5',1.9,11.5,44),NP('2-11.5',2.375,11.5,56.4)]
 };
 $('ser').innerHTML=Object.keys(ROSCAS).map(k=>`<option>${k}</option>`).join('');
 function llenaMed(){ $('med').innerHTML=ROSCAS[$('ser').value].map((r,i)=>`<option value="${i}">${r.n}</option>`).join(''); rosca(); }
@@ -316,23 +333,138 @@ function rosca(){
   const teo=r.D-r.P, brc=r.b||Math.round(teo*10)/10;
   const vc=+$('rvc').value||0, S=vc>0?1000*vc/(Math.PI*r.D):0;
   $('rD').textContent=f(r.D,2);$('rP').textContent=f(r.P,3);$('rT').textContent=r.t?r.t+' TPI':f(25.4/r.P,1)+' TPI';
-  $('rB').textContent=f(brc,2);$('rBt').textContent=f(teo,2);$('rH').textContent=f(.6134*r.P,3);
+  $('rB').textContent=f(brc,2);$('rBt').textContent=f(teo,2);$('rH').textContent=f((r.hf||.6134)*r.P,3);
   $('rRS').textContent=Math.round(S);$('rRF').textContent=Math.round(S*r.P);
   $('rRZ').textContent=f((+$('rlen').value||0)+2*r.P,1);
 }
 $('ser').onchange=llenaMed;$('med').onchange=rosca;$('rvc').oninput=rosca;$('rlen').oninput=rosca;
 
-/* Taladrado */
-function talad(){
-  const D=+$('bD').value,L=+$('bL').value,A=+$('bA').value,V=+$('bV').value,fn=+$('bF').value,Q=+$('bQ').value;
-  const punta=A>0&&A<180?(D/2)/Math.tan(A/2*Math.PI/180):0;
-  const S=D>0?1000*V/(Math.PI*D):0, F=S*fn, Z=L+punta;
-  $('bt').textContent=f(punta,2);$('bZ').textContent=f(Z,2);$('bS').textContent=Math.round(S);$('bFm').textContent=Math.round(F);
-  $('bT').textContent=F>0?f(Z/F*60,1):'–';
-  $('bN').textContent=Q>0?Math.ceil(Z/Q):'–';
+/* Trigonometría */
+const GM={ah:['Ángulo α (°)','Hipotenusa (H) · mm'],aa:['Ángulo α (°)','Cateto adyacente (CA) · mm'],ao:['Ángulo α (°)','Cateto opuesto (CO) · mm'],
+ co:['Cateto adyacente (CA) · mm','Cateto opuesto (CO) · mm'],ch:['Cateto adyacente (CA) · mm','Hipotenusa (H) · mm'],oh:['Cateto opuesto (CO) · mm','Hipotenusa (H) · mm']};
+function trig(){
+  const m=$('gmod').value,[l1,l2]=GM[m];$('gl1').textContent=l1;$('gl2').textContent=l2;
+  const v1=+$('gv1').value,v2=+$('gv2').value,R=Math.PI/180;let ca,co,h,a,err='';
+  const ang=m[0]==='a';
+  if(!(v1>0&&v2>0))err='Introduce valores mayores que cero.';
+  else if(ang&&!(v1<90))err='El ángulo debe estar entre 0° y 90°.';
+  else if(m==='ch'&&!(v1<v2))err='El cateto debe ser menor que la hipotenusa.';
+  else if(m==='oh'&&!(v1<v2))err='El cateto debe ser menor que la hipotenusa.';
+  if(!err){
+    if(m==='ah'){a=v1;h=v2;ca=h*Math.cos(a*R);co=h*Math.sin(a*R)}
+    else if(m==='aa'){a=v1;ca=v2;h=ca/Math.cos(a*R);co=ca*Math.tan(a*R)}
+    else if(m==='ao'){a=v1;co=v2;h=co/Math.sin(a*R);ca=co/Math.tan(a*R)}
+    else if(m==='co'){ca=v1;co=v2;h=Math.hypot(ca,co);a=Math.atan2(co,ca)/R}
+    else if(m==='ch'){ca=v1;h=v2;co=Math.sqrt(h*h-ca*ca);a=Math.atan2(co,ca)/R}
+    else {co=v1;h=v2;ca=Math.sqrt(h*h-co*co);a=Math.atan2(co,ca)/R}
+  }
+  $('gerr').textContent=err;
+  if(err){['gA','gCA','gCO','gH'].forEach(i=>$(i).textContent='–');$('gB').textContent='';$('gtr').textContent='';$('gsvg').innerHTML='';return}
+  $('gA').textContent=f(a,3)+'°';$('gB').textContent='β = '+f(90-a,3)+'°';
+  $('gCA').textContent=f(ca,3);$('gCO').textContent=f(co,3);$('gH').textContent=f(h,3);
+  $('gtr').textContent='sen(α) = CO / H = '+f(co/h,6)+'  ·  cos(α) = CA / H = '+f(ca/h,6)+'  ·  tan(α) = CO / CA = '+f(co/ca,6);
+  const s=Math.min(220/ca,110/co),Ax=30,Ay=160,Cx=Ax+ca*s,By=Ay-co*s,ar=26*Math.min(1,Math.max(.4,ca*s/120));
+  const ax=Ax+ar*Math.cos(a*R),ay=Ay-ar*Math.sin(a*R);
+  $('gsvg').innerHTML=`<polygon points="${Ax},${Ay} ${Cx},${Ay} ${Cx},${By}" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M${Cx-10},${Ay} L${Cx-10},${Ay-10} L${Cx},${Ay-10}" fill="none" stroke="currentColor" stroke-width="1.2"/>
+<path d="M${Ax+ar},${Ay} A${ar},${ar} 0 0 0 ${ax},${ay}" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<g fill="currentColor" font-size="13"><text x="${Ax-4}" y="${Ay+16}">A</text><text x="${Cx-2}" y="${Ay+16}">C</text><text x="${Cx+2}" y="${By-6}">B</text>
+<text x="${Ax+ar+4}" y="${Ay-6}" font-size="12">α</text>
+<text x="${(Ax+Cx)/2}" y="${Ay+16}" text-anchor="middle" font-size="11">CA</text>
+<text x="${Cx+6}" y="${(Ay+By)/2}" font-size="11">CO</text>
+<text x="${(Ax+Cx)/2-8}" y="${(Ay+By)/2-8}" font-size="11" text-anchor="end">H</text></g>`;
 }
-['bD','bL','bA','bV','bF','bQ'].forEach(i=>$(i).oninput=talad);
+['gmod','gv1','gv2'].forEach(i=>{$(i).oninput=trig;$(i).onchange=trig});
+/* Tolerancias ISO 286 */
+const RG=[3,6,10,18,30,50,80,120,180,250,315,400,500];
+const ITT=[[4,6,10,14,25,40,60,100],[5,8,12,18,30,48,75,120],[6,9,15,22,36,58,90,150],[8,11,18,27,43,70,110,180],[9,13,21,33,52,84,130,210],[11,16,25,39,62,100,160,250],[13,19,30,46,74,120,190,300],[15,22,35,54,87,140,220,350],[18,25,40,63,100,160,250,400],[20,29,46,72,115,185,290,460],[23,32,52,81,130,210,320,520],[25,36,57,89,140,230,360,570],[27,40,63,97,155,250,400,630]];
+const ESD={d:[-20,-30,-40,-50,-65,-80,-100,-120,-145,-170,-190,-210,-230],e:[-14,-20,-25,-32,-40,-50,-60,-72,-85,-100,-110,-125,-135],
+ f:[-6,-10,-13,-16,-20,-25,-30,-36,-43,-50,-56,-62,-68],g:[-2,-4,-5,-6,-7,-9,-10,-12,-14,-15,-17,-18,-20]};
+const HL=['D','E','F','G','H','JS'],SL=['d','e','f','g','h','js'];
+$('toL').innerHTML=HL.map(x=>`<option>${x}</option>`).join('');$('toL').value='H';
+$('toLs').innerHTML=SL.map(x=>`<option>${x}</option>`).join('');$('toLs').value='h';
+$('toI').innerHTML=[5,6,7,8,9,10,11,12].map(x=>`<option>${x}</option>`).join('');$('toI').value='7';
+$('toIs').innerHTML=[5,6,7,8,9,10,11,12].map(x=>`<option>${x}</option>`).join('');$('toIs').value='6';
+function tolDev(letter,it,ri,hole){
+  const IT=ITT[ri][it-5];
+  const l=letter.toLowerCase();
+  if(l==='js')return{lo:-IT/2,hi:IT/2,IT};
+  if(l==='h')return hole?{lo:0,hi:IT,IT}:{lo:-IT,hi:0,IT};
+  const es=ESD[l][ri];
+  return hole?{lo:-es,hi:-es+IT,IT}:{lo:es-IT,hi:es,IT};
+}
+function tol(){
+  const D=+$('toD').value,mo=$('tomo').value;
+  $('tohw').hidden=mo==='ej';$('toew').hidden=mo==='ag';$('tofw').hidden=mo!=='aj';
+  const bad=!(D>=1&&D<=500);
+  $('toerr').textContent=bad?'El diámetro nominal debe estar entre 1 y 500 mm.':'';
+  if(bad){['toHt','toHmin','toHmax','toEt','toEmin','toEmax','toFt'].forEach(i=>$(i).textContent='–');$('toFs').textContent='';return}
+  const ri=RG.findIndex(r=>D<=r);
+  const hl=$('toL').value,hi=+$('toI').value,sl=$('toLs').value,si=+$('toIs').value;
+  const h=tolDev(hl,hi,ri,true),s=tolDev(sl,si,ri,false);
+  const Hmin=D+h.lo/1000,Hmax=D+h.hi/1000,Emin=D+s.lo/1000,Emax=D+s.hi/1000;
+  $('toHt').textContent='Agujero Ø'+D+' '+hl+hi;$('toHmin').textContent=f(Hmin,3);$('toHmax').textContent=f(Hmax,3);
+  $('toEt').textContent='Eje Ø'+D+' '+sl+si;$('toEmin').textContent=f(Emin,3);$('toEmax').textContent=f(Emax,3);
+  const jmin=Hmin-Emax,jmax=Hmax-Emin;
+  $('toFt').textContent='Ajuste '+hl+hi+'/'+sl+si;
+  let txt;
+  if(jmin>=-1e-9)txt='Con juego · juego mínimo '+f(Math.max(0,jmin),3)+' mm · juego máximo '+f(jmax,3)+' mm';
+  else if(jmax<=1e-9)txt='Con apriete · apriete mínimo '+f(-jmax,3)+' mm · apriete máximo '+f(-jmin,3)+' mm';
+  else txt='Incierto (transición) · juego máximo '+f(jmax,3)+' mm · apriete máximo '+f(-jmin,3)+' mm';
+  $('toFs').textContent=txt;
+}
+['tomo','toD','toL','toI','toLs','toIs'].forEach(i=>{$(i).oninput=tol;$(i).onchange=tol});
 
+/* Arcos */
+const AK={H:'Altura H · mm',W:'Anchura W · mm',R:'Radio R · mm',L:'Longitud L · mm',A:'Ángulo A · °'};
+const AO=Object.keys(AK).map(k=>`<option value="${k}">${AK[k]}</option>`).join('');
+$('ak1').innerHTML=AO;$('ak2').innerHTML=AO;$('ak1').value='R';$('ak2').value='A';
+function bis(fn,target){let lo=1e-9,hi=Math.PI/2;for(let i=0;i<80;i++){const m=(lo+hi)/2;if(fn(m)<target)lo=m;else hi=m}return(lo+hi)/2}
+function arco(){
+  const k1=$('ak1').value,k2=$('ak2').value;$('al1').textContent=AK[k1];$('al2').textContent=AK[k2];
+  const v={};v[k1]=+$('av1').value;v[k2]=+$('av2').value;
+  const R_=Math.PI/180;let err='',R,x;
+  const has=k=>k in v;
+  if(k1===k2)err='Elige dos valores distintos.';
+  else if(!(v[k1]>0&&v[k2]>0))err='Introduce valores mayores que cero.';
+  else if(has('A')&&!(v.A<180))err='El ángulo debe ser menor de 180°.';
+  if(!err){
+    if(has('R')&&has('A')){R=v.R;x=v.A*R_/2}
+    else if(has('R')&&has('W')){if(v.W>2*v.R)err='La cuerda no puede ser mayor que el diámetro.';else{R=v.R;x=Math.asin(v.W/(2*R))}}
+    else if(has('R')&&has('H')){if(v.H>v.R)err='Con este radio la altura máxima es R (arco de 180°).';else{R=v.R;x=Math.acos(1-v.H/R)}}
+    else if(has('R')&&has('L')){R=v.R;x=v.L/R/2;if(x>=Math.PI/2)err='El arco resultante es de 180° o más.'}
+    else if(has('W')&&has('H')){R=(v.W*v.W/4+v.H*v.H)/(2*v.H);if(v.H>R)err='Con estas medidas el arco sería mayor de 180°.';else x=Math.asin(v.W/(2*R))}
+    else if(has('W')&&has('A')){x=v.A*R_/2;R=v.W/(2*Math.sin(x))}
+    else if(has('W')&&has('L')){const q=v.L/v.W;if(!(q>1&&q<=Math.PI/2))err='La longitud del arco debe ser mayor que la cuerda y dar menos de 180°.';else{x=bis(t=>t/Math.sin(t),q);R=v.W/(2*Math.sin(x))}}
+    else if(has('H')&&has('A')){x=v.A*R_/2;R=v.H/(1-Math.cos(x))}
+    else if(has('H')&&has('L')){const q=v.H/v.L;if(!(q<=1/Math.PI))err='Con esa altura y longitud el arco sería mayor de 180°.';else{x=bis(t=>(1-Math.cos(t))/(2*t),q);R=v.L/(2*x)}}
+    else if(has('L')&&has('A')){x=v.A*R_/2;R=v.L/(2*x)}
+  }
+  $('aerr').textContent=err;
+  if(err||!(R>0)||!(x>0)){['aH','aW','aR','aL','aA'].forEach(i=>$(i).textContent='–');$('asvg').innerHTML='';return}
+  const H=R*(1-Math.cos(x)),W=2*R*Math.sin(x),L=2*R*x,A=2*x/R_;
+  $('aH').textContent=f(H,3);$('aW').textContent=f(W,3);$('aR').textContent=f(R,3);$('aL').textContent=f(L,3);$('aA').textContent=f(A,3);
+  const xs=50*Math.PI/180,cx=150,cy=105,r=85,ex=r*Math.sin(xs),ey=cy-r*Math.cos(xs),top=cy-r;
+  $('asvg').innerHTML=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="currentColor" opacity=".25"/>
+<path d="M${cx-ex},${ey} A${r},${r} 0 0 1 ${cx+ex},${ey}" fill="none" stroke="var(--ac)" stroke-width="3.5"/>
+<line x1="${cx-ex}" y1="${ey}" x2="${cx+ex}" y2="${ey}" stroke="currentColor" stroke-width="1.6"/>
+<line x1="${cx}" y1="${ey}" x2="${cx}" y2="${top}" stroke="currentColor" stroke-width="1.6" stroke-dasharray="4 3"/>
+<line x1="${cx}" y1="${cy}" x2="${cx+ex}" y2="${ey}" stroke="currentColor" stroke-width="1.2" opacity=".7"/>
+<line x1="${cx}" y1="${cy}" x2="${cx-ex}" y2="${ey}" stroke="currentColor" stroke-width="1.2" opacity=".7"/>
+<circle cx="${cx}" cy="${cy}" r="2.5" fill="currentColor"/>
+<g fill="currentColor" font-size="12"><text x="${cx+5}" y="${(ey+top)/2+4}">H</text><text x="${cx}" y="${ey+14}" text-anchor="middle">W</text>
+<text x="${cx+ex*.55+6}" y="${cy-(cy-ey)*.45}">R</text><text x="${cx+ex*.6}" y="${top+(ey-top)*.1-4}" fill="var(--ac)">L</text>
+<text x="${cx}" y="${cy+18}" text-anchor="middle" font-size="11">A</text></g>`;
+}
+['ak1','ak2','av1','av2'].forEach(i=>{$(i).oninput=arco;$(i).onchange=arco});
+
+/* Imprimir */
+function fichaImprimir(){
+  const n=$('pnom').value.trim();$('pimp').textContent=(n?n+' · ':'')+new Date().toLocaleDateString('es-ES');
+  const on=document.querySelector('nav button.on');$('ptab').textContent=on?on.textContent:'';
+  window.print();
+}
+$('pprint').onclick=fichaImprimir;
 /* Conversiones */
 const CV=[['cmm','cin',1/25.4],['cfm','cfi',1/25.4],['cvm','cvf',3.28084]];
 CV.forEach(([a,b,k])=>{
@@ -341,7 +473,7 @@ CV.forEach(([a,b,k])=>{
 });
 $('ctp').oninput=()=>{const t=+$('ctp').value;$('cpm').value=t>0?f(25.4/t,4):''};
 $('cpm').oninput=()=>{const p=+$('cpm').value;$('ctp').value=p>0?f(25.4/p,3):''};
-llenaMed();talad();
+llenaMed();
 
 /* Generador de programas */
 function puntosGen(){
@@ -387,7 +519,7 @@ $('gdl').onclick=()=>{const c=$('gc').value,ext=c==='hh'?'.H':'.nc';const a=docu
   a.href=URL.createObjectURL(new Blob([$('gout').value],{type:'text/plain'}));a.download='programa_'+($('gn').value||'1')+ext;a.click()};
 genera();
 
-/* Línea / rejilla */
+/* Patrón rectangular */
 function rejilla(){
   const nx=Math.max(1,Math.floor(+$('lx').value||1)),ny=Math.max(1,Math.floor(+$('ly').value||1)),
     px=+$('lpx').value||0,py=+$('lpy').value||0,ox=+$('lox').value||0,oy=+$('loy').value||0,g=(+$('lag').value||0)*Math.PI/180;
@@ -404,45 +536,6 @@ function rejilla(){
   if($('gp').value==='grid')genera();
 }
 ['lx','ly','lpx','lpy','lox','loy','lag'].forEach(i=>$(i).oninput=rejilla);
-
-/* Cajeras */
-function cajera(){
-  const r=$('ct').value==='r',L=+$('cl').value,W=+$('cw').value,cr=+$('ccr').value,dp=+$('cd').value,
-    D=+$('cD').value,ae=D*(+$('cae').value||0)/100,ap=+$('cap').value,fin=+$('cfin').value||0,F=+$('cF').value;
-  if(!(D>0&&ae>0&&ap>0&&L>0)){['cR1','cR2','cR3','cR4','cR5','cR6'].forEach(i=>$(i).textContent='–');return}
-  const nz=Math.ceil(dp/ap);
-  let npas,cont,tot;
-  if(r){
-    const hmin=Math.min(L,W)/2-D/2-fin;
-    npas=Math.max(1,Math.ceil(hmin/ae)+ (hmin>0?0:0));
-    const step=hmin>0?hmin/npas:0; let len=0;
-    for(let k=0;k<=npas;k++){const o=k*step;len+=2*((L-D-2*fin-2*o)+(W-D-2*fin-2*o))}
-    cont=2*((L-D)+(W-D)); len+=cont;
-    tot=len*nz;
-    $('cR6').textContent=cr>=D/2?'OK (r esquina ≥ r fresa)':'Radio de esquina menor que el de la fresa';
-  } else {
-    const rmax=L/2-D/2-fin;
-    npas=Math.max(1,Math.ceil(rmax/ae)); const step=rmax/npas; let len=0;
-    for(let k=0;k<=npas;k++)len+=2*Math.PI*Math.max(0,k*step);
-    cont=2*Math.PI*(L/2-D/2); len+=cont;
-    tot=len*nz;
-    $('cR6').textContent=L>=D?'OK':'La fresa es mayor que el diámetro';
-  }
-  $('cR1').textContent=nz;$('cR2').textContent=npas;$('cR3').textContent=f(cont,1);$('cR4').textContent=Math.round(tot);
-  $('cR5').textContent=F>0?f(tot/F,2):'–';
-}
-['ct','cl','cw','ccr','cd','cD','cae','cap','cfin','cF'].forEach(i=>{$(i).oninput=cajera;$(i).onchange=cajera});
-
-/* Fresado de rosca */
-function frRosca(){
-  const int=$('ftp').value==='i',D=+$('fD').value,P=+$('fP').value,L=+$('fL').value,d=+$('fd').value,z=+$('fnz').value||1,vc=+$('fvc').value,fz=+$('ffz').value;
-  if(!(D>0&&P>0&&d>0&&vc>0)){['fR1','fR2','fR3','fR4','fR5','fR6'].forEach(i=>$(i).textContent='–');return}
-  const rad=int?(D-d)/2:(D+d)/2, S=1000*vc/(Math.PI*d), Fe=S*fz*z, Fc=int?Fe*(D-d)/D:Fe*(D+d)/D;
-  $('fR1').textContent=f(rad,3);$('fR2').textContent=f(L/P+1,1);$('fR3').textContent=f(P,3);
-  $('fR4').textContent=Math.round(S);$('fR5').textContent=Math.round(Fe);$('fR6').textContent=Math.round(Fc);
-  $('fR6').title=int&&d>=D?'La fresa no cabe en el agujero':'';
-}
-['ftp','fD','fP','fL','fd','fnz','fvc','ffz'].forEach(i=>{$(i).oninput=frRosca;$(i).onchange=frRosca});
 
 /* Biblioteca de herramientas (localStorage, con memoria si no hay acceso) */
 let HER=[];
@@ -461,7 +554,7 @@ $('htb').onclick=e=>{
     document.querySelector('[data-t=t2]').click();}
   if(x!==undefined){HER.splice(+x,1);hGuarda();hPinta()}
 };
-rejilla();cajera();frRosca();hPinta();
+rejilla();hPinta();trig();tol();arco();
 </script>
 <script>
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
